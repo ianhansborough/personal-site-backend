@@ -9,6 +9,7 @@ import (
 
 	"github.com/beeker1121/mailchimp-go/lists/members"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 
 	mailchimp "github.com/beeker1121/mailchimp-go"
 )
@@ -26,9 +27,16 @@ type Response struct {
 }
 
 func main() {
+
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowCredentials: true,
+	})
+
 	r := mux.NewRouter()
 	r.HandleFunc("/contact", handleContact).Methods("POST")
-	log.Fatal(http.ListenAndServe(":8080", r))
+	handler := c.Handler(r)
+	log.Fatal(http.ListenAndServe(":8080", handler))
 }
 
 func handleContact(w http.ResponseWriter, r *http.Request) {
